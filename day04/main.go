@@ -7,6 +7,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 var roomPattern = regexp.MustCompile(`([a-z-]+)-(\d+)\[([a-z]{1,5})\]`)
@@ -21,6 +22,9 @@ func main() {
 
 	sum := 0
 
+	var validRooms []string
+	var sectorIDs []int
+
 	b := bufio.NewReaderSize(f, 128)
 	for {
 		line, isPrefix, err := b.ReadLine()
@@ -32,7 +36,7 @@ func main() {
 			panic("buffer too small or error during read")
 		}
 
-		isValid, sectionID, err := parseLine(string(line))
+		isValid, sectorID, roomID, err := parseLine(string(line))
 		if err != nil {
 			panic(err)
 		}
@@ -41,25 +45,39 @@ func main() {
 			continue
 		}
 
-		sum += sectionID
+		sum += sectorID
+
+		validRooms = append(validRooms, decodeRoomID(roomID, sectorID))
+		sectorIDs = append(sectorIDs, sectorID)
 	}
 
-	fmt.Printf("section id sum = %d\n", sum)
+	fmt.Printf("sector id sum = %d\n", sum)
+	fmt.Printf("found %d valid rooms\n", len(validRooms))
+
+	for i, room := range validRooms {
+		if !strings.Contains(room, "north") {
+			continue
+		}
+
+		fmt.Printf("#%03d: %s\n", sectorIDs[i], room)
+	}
 }
 
-func parseLine(line string) (isValid bool, sectionID int, err error) {
+func parseLine(line string) (isValid bool, sectorID int, roomID string, err error) {
 	m := roomPattern.FindStringSubmatch(line)
 	if m == nil || len(m) != 4 {
 		err = fmt.Errorf("unable to parse line: %s", line)
 		return
 	}
 
-	cs := calcChecksum(m[1])
+	roomID = m[1]
+
+	cs := calcChecksum(roomID)
 	if cs != m[3] {
 		return
 	}
 
-	sectionID, err = strconv.Atoi(m[2])
+	sectorID, err = strconv.Atoi(m[2])
 	if err != nil {
 		err = fmt.Errorf("invalid section id: %s", m[2])
 	}
