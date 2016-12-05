@@ -4,7 +4,8 @@ import "fmt"
 
 const (
 	prefix    string = "00000"
-	prefixLen int    = len(prefix) + 1
+	prefixLen int    = len(prefix) + 2
+	useBytes  int    = (prefixLen + 1) / 2
 	pwdLen    int    = 8
 )
 
