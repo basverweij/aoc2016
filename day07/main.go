@@ -15,7 +15,8 @@ func main() {
 
 	b := bufio.NewReaderSize(f, 256)
 
-	nValid := 0
+	nSupportTLS := 0
+	nSupportSSL := 0
 
 	for {
 		line, isPrefix, err := b.ReadLine()
@@ -27,15 +28,26 @@ func main() {
 			panic("buffer too small or unexpected error")
 		}
 
-		valid, err := supportsTLS(string(line))
+		supportsTLS, err := supportsTLS(string(line))
 		if err != nil {
 			panic(err)
 		}
 
-		if valid {
-			nValid++
+		if supportsTLS {
+			nSupportTLS++
+		}
+
+		supportsSSL, err := supportsSSL(string(line))
+		if err != nil {
+			panic(err)
+		}
+
+		if supportsSSL {
+			nSupportSSL++
 		}
 	}
 
-	fmt.Printf("found %d IPs supporting TLS\n", nValid)
+	fmt.Printf("found %d IPs supporting TLS\n", nSupportTLS)
+
+	fmt.Printf("found %d IPs supporting SSL\n", nSupportSSL)
 }

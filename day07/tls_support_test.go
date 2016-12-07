@@ -3,15 +3,15 @@ package main
 import "testing"
 import "strings"
 
-func testParseIP(t *testing.T, ip string, expectedIPs, expectedHypernets []string) {
-	actualIPs, actualHypernets, err := parseIP(ip)
+func testParseIP(t *testing.T, ip string, expectedSupernets, expectedHypernets []string) {
+	actualSupernets, actualHypernets, err := parseIP(ip)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 		return
 	}
 
-	if strings.Join(actualIPs, "|") != strings.Join(expectedIPs, "|") {
-		t.Errorf("expected IPs %v for '%s', but got %v", expectedIPs, ip, actualIPs)
+	if strings.Join(actualSupernets, "|") != strings.Join(expectedSupernets, "|") {
+		t.Errorf("expected supernets %v for '%s', but got %v", expectedSupernets, ip, actualSupernets)
 	}
 
 	if strings.Join(actualHypernets, "|") != strings.Join(expectedHypernets, "|") {

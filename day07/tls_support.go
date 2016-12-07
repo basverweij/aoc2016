@@ -7,22 +7,22 @@ import (
 )
 
 func supportsTLS(ip string) (bool, error) {
-	ips, hypernets, err := parseIP(ip)
+	supernets, hypernets, err := parseIP(ip)
 	if err != nil {
 		return false, err
 	}
 
 	// first check if at least one of the IPs contains an ABBA
-	abbaInIP := false
-	for _, ip := range ips {
-		if containsABBA(ip) {
-			abbaInIP = true
+	abbaInSupernet := false
+	for _, supernet := range supernets {
+		if containsABBA(supernet) {
+			abbaInSupernet = true
 			break
 		}
 	}
 
 	// if none of the IPs contains an ABBA were done
-	if !abbaInIP {
+	if !abbaInSupernet {
 		return false, nil
 	}
 
@@ -39,7 +39,7 @@ func supportsTLS(ip string) (bool, error) {
 
 var ipPattern = regexp.MustCompile(`[a-z]+|\[[a-z]+\]`)
 
-func parseIP(ip string) (ips []string, hypernets []string, err error) {
+func parseIP(ip string) (supernets []string, hypernets []string, err error) {
 	m := ipPattern.FindAllString(ip, -1)
 	if m == nil || len(m) < 1 {
 		err = fmt.Errorf("invalid ip: %s", ip)
@@ -51,8 +51,8 @@ func parseIP(ip string) (ips []string, hypernets []string, err error) {
 			// hypernet
 			hypernets = append(hypernets, s)
 		} else {
-			// ip
-			ips = append(ips, s)
+			// supernet
+			supernets = append(supernets, s)
 		}
 	}
 
