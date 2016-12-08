@@ -4,6 +4,6 @@
     "version": "0.1.0",
     "command": "go",
     "isShellCommand": true,
-    "args": ["test", "-v", "./day07"],
+    "args": ["test", "-v", "./day08"],
     "showOutput": "always"
 }
