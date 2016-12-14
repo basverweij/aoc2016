@@ -11,10 +11,10 @@ func main() {
 		panic(err)
 	}
 
-	s, err := decompress(string(b))
+	c, err := decompress(string(b))
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("decompressed length is: %d\n", len([]rune(s)))
+	fmt.Printf("decompressed length is: %d\n", c)
 }

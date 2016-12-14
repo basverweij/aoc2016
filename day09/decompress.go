@@ -5,10 +5,13 @@ import (
 	"strconv"
 )
 
-func decompress(s string) (string, error) {
-	var buf []rune
+func decompress(s string) (int, error) {
+	return decompressRunes([]rune(s))
+}
 
-	r := []rune(s)
+func decompressRunes(r []rune) (int, error) {
+	c := 0
+
 	n := len(r)
 	for i := 0; i < n; i++ {
 		runeValue := r[i]
@@ -18,22 +21,25 @@ func decompress(s string) (string, error) {
 			// scan int until 'x'
 			markerLen, j, err := scanInt(r, i+1, 'x')
 			if err != nil {
-				return "", err
+				return 0, err
 			}
 
 			// scan int until ')'
 			markerCount, j, err := scanInt(r, j+1, ')')
 			if err != nil {
-				return "", err
+				return 0, err
 			}
 
 			if j+1+markerLen > len(r) {
-				return "", fmt.Errorf("invalid marker: %s", string(r[i:]))
+				return 0, fmt.Errorf("invalid marker: %s", string(r[i:]))
 			}
 
-			for ; markerCount > 0; markerCount-- {
-				buf = append(buf, r[j+1:j+1+markerLen]...)
+			n, err := decompressRunes(r[j+1 : j+1+markerLen])
+			if err != nil {
+				return 0, err
 			}
+
+			c += markerCount * n
 
 			// move i to last position of repeated section
 			i = j + markerLen
@@ -41,10 +47,16 @@ func decompress(s string) (string, error) {
 			continue
 		}
 
-		buf = append(buf, runeValue)
+		c++
 	}
 
-	return string(buf), nil
+	return c, nil
+}
+
+// getMarkerLen returns the length of the marker in r starting at start,
+// and expands all recursive markers found
+func getMarkerLen(r []rune, start int) (len int, err error) {
+	return
 }
 
 // scanInt searches for an int in the rune slice, starting at 'start'

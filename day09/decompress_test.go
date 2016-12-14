@@ -19,45 +19,45 @@ func assertNotEquals(t *testing.T, notExpected, actual interface{}, msg string) 
 }
 
 func TestDecompressEmptyString(t *testing.T) {
-	s, err := decompress("")
+	c, err := decompress("")
 	assertEquals(t, nil, err, "error")
-	assertEquals(t, "", s, "output string")
+	assertEquals(t, 0, c, "output string")
 }
 
 func TestDecompressStringWithoutMarkers(t *testing.T) {
-	s, err := decompress("ADVENT")
+	c, err := decompress("ADVENT")
 	assertEquals(t, nil, err, "error")
-	assertEquals(t, "ADVENT", s, "output string")
+	assertEquals(t, 6, c, "output string")
 }
 
 func TestDecompressStringWithSingleMarker(t *testing.T) {
-	s, err := decompress("A(1x5)BC")
+	c, err := decompress("A(1x5)BC")
 	assertEquals(t, nil, err, "error")
-	assertEquals(t, "ABBBBBC", s, "output string")
+	assertEquals(t, 7, c, "output string")
 }
 
 func TestDecompressStringWithMarkerAtStart(t *testing.T) {
-	s, err := decompress("(3x3)XYZ")
+	c, err := decompress("(3x3)XYZ")
 	assertEquals(t, nil, err, "error")
-	assertEquals(t, "XYZXYZXYZ", s, "output string")
+	assertEquals(t, 9, c, "output string")
 }
 
 func TestDecompressStringWithMultipleMarkers(t *testing.T) {
-	s, err := decompress("A(2x2)BCD(2x2)EFG")
+	c, err := decompress("A(2x2)BCD(2x2)EFG")
 	assertEquals(t, nil, err, "error")
-	assertEquals(t, "ABCBCDEFEFG", s, "output string")
+	assertEquals(t, 11, c, "output string")
 }
 
-func TestDecompressStringWithFakeMarker(t *testing.T) {
-	s, err := decompress("(6x1)(1x3)A")
+func TestDecompressStringWithRecursiveMarker(t *testing.T) {
+	c, err := decompress("(6x1)(1x3)A")
 	assertEquals(t, nil, err, "error")
-	assertEquals(t, "(1x3)A", s, "output string")
+	assertEquals(t, 3, c, "output string")
 }
 
-func TestDecompressStringWithRepeatedFakeMarker(t *testing.T) {
-	s, err := decompress("X(8x2)(3x3)ABCY")
+func TestDecompressStringWithRepeatedRecursiveMarker(t *testing.T) {
+	c, err := decompress("X(8x2)(3x3)ABCY")
 	assertEquals(t, nil, err, "error")
-	assertEquals(t, "X(3x3)ABC(3x3)ABCY", s, "output string")
+	assertEquals(t, 20, c, "output string")
 }
 
 func TestScanIntEmptySlice(t *testing.T) {
