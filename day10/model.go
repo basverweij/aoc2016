@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type model struct {
 	cmps map[int]*compareInstruction
@@ -11,6 +9,9 @@ type model struct {
 	// ValueCompares saves all low (first map index) and high (second map index) compares
 	// and maps these to the last bot id that compared these two value
 	ValueCompares map[int]map[int]int
+
+	// Outputs stores the last value put in each output (map index)
+	Outputs map[int]int
 }
 
 type bot struct {
@@ -22,6 +23,7 @@ type bot struct {
 func newModel(inits []*initInstruction, cmps []*compareInstruction) *model {
 	m := &model{}
 	m.ValueCompares = make(map[int]map[int]int, 0)
+	m.Outputs = make(map[int]int, 0)
 
 	m.bots = make(map[int]*bot)
 
@@ -103,10 +105,14 @@ func (m *model) step() []*bot {
 
 		if cmp.LowIsBot {
 			m.checkBot(cmp.Low).addValue(bot.Low)
+		} else {
+			m.Outputs[cmp.Low] = bot.Low
 		}
 
 		if cmp.HighIsBot {
 			m.checkBot(cmp.High).addValue(bot.High)
+		} else {
+			m.Outputs[cmp.High] = bot.High
 		}
 
 		m.SaveValueCompare(bot)
