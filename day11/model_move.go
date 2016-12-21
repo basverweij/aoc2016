@@ -1,11 +1,8 @@
 package main
 
-import (
-	"fmt"
-)
-
-func (m *model) Move(device1, device2 string, toFloor int) error {
-	if toFloor != m.Elevator-1 && toFloor != m.Elevator+1 {
+/*
+func (m *model) Move(device1, device2 string, toFloor uint32) error {
+	if toFloor != m.Elevator()-1 && toFloor != m.Elevator()+1 {
 		return fmt.Errorf("invalid toFloor %d (current floor = %d)", toFloor, m.Elevator)
 	}
 
@@ -25,7 +22,7 @@ func (m *model) Move(device1, device2 string, toFloor int) error {
 		}
 	}
 
-	m.Elevator = toFloor
+	m.setFloor(0, toFloor)
 
 	return nil
 }
@@ -40,3 +37,4 @@ func (m *model) moveDevice(code string, toFloor int) error {
 
 	return nil
 }
+*/

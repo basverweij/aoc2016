@@ -1,47 +1,116 @@
 package main
 
 import "fmt"
-import "sort"
+
+const elevatorIdx uint32 = 15
+
+var deviceTypes = []string{"G", "M"}
 
 type model struct {
-	// Devices contains a sorted listed of all devices
-	devices []string
+	// codes contains the device codes
+	codes []string
 
-	// Floors maps each device code (XxG or XxM) to its current floor
-	floors map[string]int
-
-	// Elevator contains the elevator's current floor
-	Elevator int
+	// floors contains the floor of each device, encoded in 2 bits
+	// starting with the first device in the least significant bits (0-1),
+	// the second device in bits 2-3, etc.
+	// the elevator position is saved in bits 30-31
+	floors uint32
 }
 
 func newModel() *model {
-	return &model{floors: make(map[string]int)}
+	m := &model{}
+
+	// set elevator to first floor
+	m.setFloor(elevatorIdx, 1)
+
+	return m
 }
 
-func (m *model) AddDevice(code string, floor int) {
-	m.devices = append(m.devices, code)
-	sort.Strings(m.devices)
+func (m *model) setFloor(idx, floor uint32) {
+	// we use 2 bits per device
+	idx <<= 1
 
-	m.floors[code] = floor
+	m.floors &= ^(uint32(3) << idx)
+	m.floors |= (floor - 1) << idx
+}
+
+func (m *model) getFloor(idx uint32) uint32 {
+	// we use 2 bits per device
+	idx <<= 1
+
+	return ((m.floors >> idx) & uint32(3)) + 1
+}
+
+func (m *model) AddDevice(code string, genFloor, chpFloor uint32) {
+	// each device uses two pairs of 2 bits,
+	// and the first 2 bits are for the elevator
+	n := m.NumDevices()
+	if n >= elevatorIdx-1 {
+		panic("too many devices")
+	}
+
+	// add code
+	m.codes = append(m.codes, code)
+
+	// set generator and microchip floors
+	m.setFloor(n, genFloor)
+	m.setFloor(n+1, chpFloor)
+}
+
+func (m *model) Hash() uint32 {
+	return m.floors
+}
+
+func (m *model) NumDevices() uint32 {
+	return uint32(len(m.codes) * 2)
+}
+
+func (m *model) Code(idx uint32) string {
+	return m.codes[idx>>1] + deviceTypes[idx&1]
+}
+
+func (m *model) Elevator() uint32 {
+	return m.getFloor(elevatorIdx)
+}
+
+func (m *model) MoveElevator(toFloor uint32, devices ...uint32) {
+	if toFloor != m.Elevator()-1 && toFloor != m.Elevator()+1 {
+		panic("invalid elevator floor")
+	}
+
+	m.setFloor(elevatorIdx, toFloor)
+
+	for _, device := range devices {
+		m.setFloor(device, toFloor)
+	}
 }
 
 func (m *model) Print() {
 	var s, fs string
-	for f := 4; f >= 1; f-- {
-		s = "."
-		if m.Elevator == f {
+
+	var i, j uint32
+	nCodes := uint32(len(m.codes))
+
+	var f uint32 = 4
+	for ; f >= 1; f-- {
+		if m.Elevator() == f {
 			s = "E"
+		} else {
+			s = "."
 		}
 
 		fs = fmt.Sprintf("F%d   %s    ", f, s)
 
-		for _, code := range m.devices {
-			s = ".  "
-			if m.floors[code] == f {
-				s = code
-			}
+		for i = 0; i < nCodes; i++ {
+			for j = 0; j < 2; j++ {
+				if m.getFloor(i*2+j) == f {
+					s = m.codes[i] + deviceTypes[j]
+				} else {
+					s = ".  "
+				}
 
-			fs += fmt.Sprintf("%s  ", s)
+				fs += fmt.Sprintf("%s  ", s)
+			}
 		}
 
 		fmt.Println(fs)

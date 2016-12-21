@@ -2,27 +2,64 @@ package main
 
 import "fmt"
 
-var n int
+// seen saves all previous seen model hashes,
+// mapped against the step in which the hash was found.
+var seen = make(map[uint32]int)
+
+var minSteps = 1 << 31
 
 func main() {
 	fmt.Println("\ninput:")
 	input.Print()
 
-	move("PrG", "PrM", 2)
+	fmt.Println(nextStep(*input, 0))
 
-	steps := input.NextSteps()
-	for _, step := range steps {
-		fmt.Printf("Move '%s' and '%s' to %d\n", step.Dev1, step.Dev2, step.ToFloor)
-	}
+	fmt.Printf("minimum number of steps = %d\n", minSteps)
 }
 
-func move(device1, device2 string, toFloor int) {
-	n++
-	fmt.Printf("\nstep #%d:\n", n)
-
-	if err := input.Move(device1, device2, toFloor); err != nil {
-		panic(err)
+func nextStep(m model, numStep int) (bool, int) {
+	if numStep >= minSteps {
+		// already found a lower number of steps
+		return false, numStep
 	}
 
-	input.Print()
+	h := m.Hash()
+
+	if h == targetHash {
+		return true, numStep
+	}
+
+	if seenSteps, found := seen[h]; found && seenSteps <= numStep {
+		return false, numStep
+	}
+
+	seen[h] = numStep
+
+	steps := m.NextSteps()
+	// fmt.Printf("Step %03d: available steps = %v\n", numStep, steps)
+
+	for _, step := range steps {
+		n := &model{}
+		*n = m
+
+		n.MoveElevator(step.ToFloor, step.Devices...)
+
+		// fmt.Printf("Step #%03d: %s (current hash = %032b)\n", numStep+1, step, n.Hash())
+		// n.Print()
+
+		if !n.IsValid() {
+			// fmt.Println("not valid")
+			continue
+		}
+
+		if found, foundSteps := nextStep(*n, numStep+1); found {
+			fmt.Printf("found target after %d steps\n", foundSteps)
+
+			if foundSteps < minSteps {
+				minSteps = foundSteps
+			}
+		}
+	}
+
+	return false, numStep
 }

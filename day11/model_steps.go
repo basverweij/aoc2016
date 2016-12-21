@@ -1,8 +1,24 @@
 package main
 
+import "fmt"
+
 type step struct {
-	Dev1, Dev2 string
-	ToFloor    int
+	model   *model
+	ToFloor uint32
+	Devices []uint32
+}
+
+func newStep(m *model, toFloor uint32, devices ...uint32) step {
+	return step{m, toFloor, devices}
+}
+
+func (s step) String() string {
+	var codes []string
+	for _, idx := range s.Devices {
+		codes = append(codes, s.model.Code(idx))
+	}
+
+	return fmt.Sprintf("Move %v to floor %d", codes, s.ToFloor)
 }
 
 func (m *model) NextSteps() []step {
@@ -11,24 +27,25 @@ func (m *model) NextSteps() []step {
 	// get devices on current floor
 	availableDevs := m.availableDevices()
 
-	var availableFloors []int
-	if m.Elevator > 1 {
-		availableFloors = append(availableFloors, m.Elevator-1)
+	var availableFloors []uint32
+	if m.Elevator() < 4 {
+		// if we can move up, check this first
+		availableFloors = append(availableFloors, m.Elevator()+1)
 	}
 
-	if m.Elevator < 4 {
-		availableFloors = append(availableFloors, m.Elevator+1)
+	if m.Elevator() > 1 && len(m.devicesOnFloor(m.Elevator()-1)) > 0 {
+		availableFloors = append(availableFloors, m.Elevator()-1)
 	}
 
 	for _, toFloor := range availableFloors {
-		for i, code := range availableDevs {
-			// all single device moves are a step
-			steps = append(steps, step{code, "", toFloor})
-
+		for i, idx1 := range availableDevs {
 			// all moves of two devices are a step
-			for _, code2 := range availableDevs[i+1:] {
-				steps = append(steps, step{code, code2, toFloor})
+			for _, idx2 := range availableDevs[i+1:] {
+				steps = append(steps, newStep(m, toFloor, idx1, idx2))
 			}
+
+			// all single device moves are a step
+			steps = append(steps, newStep(m, toFloor, idx1))
 		}
 
 	}
@@ -36,14 +53,19 @@ func (m *model) NextSteps() []step {
 	return steps
 }
 
-func (m *model) availableDevices() []string {
-	var devs []string
+func (m *model) devicesOnFloor(floor uint32) []uint32 {
+	var devs []uint32
 
-	for _, code := range m.devices {
-		if m.floors[code] == m.Elevator {
-			devs = append(devs, code)
+	var i uint32
+	for i = 0; i < m.NumDevices(); i++ {
+		if m.getFloor(i) == floor {
+			devs = append(devs, i)
 		}
 	}
 
 	return devs
+}
+
+func (m *model) availableDevices() []uint32 {
+	return m.devicesOnFloor(m.Elevator())
 }
