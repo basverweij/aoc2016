@@ -15,6 +15,7 @@ func main() {
 
 	// create system with four registers
 	s := newSystem("a", "b", "c", "d")
+	s.Reg["c"] = 1
 
 	// parse input file
 	b := bufio.NewReaderSize(f, 16)
