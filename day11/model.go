@@ -57,8 +57,26 @@ func (m *model) AddDevice(code string, genFloor, chpFloor uint32) {
 	m.setFloor(n+1, chpFloor)
 }
 
-func (m *model) Hash() uint32 {
-	return m.floors
+// Hash returns a unique number for each comparable state of the model.
+func (m *model) Hash() uint64 {
+	var h uint64
+
+	numCodes := uint8(len(m.codes))
+	for i := uint8(0); i < numCodes; i++ {
+		pairIdx := (m.floors >> (i * 4)) & 0xf
+		pairIdx *= 3
+
+		numPairs := (h >> pairIdx) & 0x7
+		numPairs++
+
+		h &= ^(uint64(0x7) << pairIdx)
+		h |= numPairs << pairIdx
+	}
+
+	h &= ^(uint64(0x3) << 62)
+	h |= uint64((m.floors>>(elevatorIdx*2))&uint32(3)) << 62
+
+	return h
 }
 
 func (m *model) NumDevices() uint32 {

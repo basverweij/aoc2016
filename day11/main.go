@@ -7,7 +7,7 @@ import (
 
 // seen saves all previous seen model hashes,
 // mapped against the step in which the hash was found.
-var seen = make(map[uint32]int)
+var seen = make(map[uint64]int)
 
 var minSteps = 1 << 31
 
@@ -37,6 +37,7 @@ func nextStep(m model, numStep int) (bool, int) {
 	}
 
 	if seenSteps, found := seen[h]; found && seenSteps <= numStep {
+		// fmt.Printf("found hash %064b already in %d steps\n", h, seenSteps)
 		return false, numStep
 	}
 
@@ -51,7 +52,7 @@ func nextStep(m model, numStep int) (bool, int) {
 
 		n.MoveElevator(step.ToFloor, step.Devices...)
 
-		// fmt.Printf("Step #%03d: %s (current hash = %032b)\n", numStep+1, step, n.Hash())
+		// fmt.Printf("Step #%03d: %s (current hash = %064b)\n", numStep+1, step, n.Hash())
 		// n.Print()
 
 		if !n.IsValid() {

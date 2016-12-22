@@ -33,8 +33,16 @@ func (m *model) NextSteps() []step {
 		availableFloors = append(availableFloors, m.Elevator()+1)
 	}
 
-	if m.Elevator() > 1 && len(m.devicesOnFloor(m.Elevator()-1)) > 0 {
-		availableFloors = append(availableFloors, m.Elevator()-1)
+	if m.Elevator() > 1 {
+		// check if anything is left on the lower flowers
+		var numLeft uint32
+		for i := uint32(1); i < m.Elevator(); i++ {
+			numLeft += uint32(len(m.devicesOnFloor(i)))
+		}
+
+		if numLeft > 0 {
+			availableFloors = append(availableFloors, m.Elevator()-1)
+		}
 	}
 
 	for _, toFloor := range availableFloors {
