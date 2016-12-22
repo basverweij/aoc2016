@@ -12,6 +12,8 @@ func init() {
 	input.AddDevice("Cu", 2, 3)
 	input.AddDevice("Ru", 2, 3)
 	input.AddDevice("Pl", 2, 3)
+	// input.AddDevice("El", 1, 1)
+	// input.AddDevice("Di", 1, 1)
 
 	target := newModel()
 	target.MoveElevator(2)
@@ -22,6 +24,8 @@ func init() {
 	target.AddDevice("Cu", 4, 4)
 	target.AddDevice("Ru", 4, 4)
 	target.AddDevice("Pl", 4, 4)
+	// target.AddDevice("El", 4, 4)
+	// target.AddDevice("Di", 4, 4)
 
 	targetHash = target.Hash()
 	fmt.Printf("target hash = %d (%032b)\n", targetHash, targetHash)

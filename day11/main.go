@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 // seen saves all previous seen model hashes,
 // mapped against the step in which the hash was found.
@@ -12,7 +15,11 @@ func main() {
 	fmt.Println("\ninput:")
 	input.Print()
 
+	fmt.Println(time.Now())
+
 	fmt.Println(nextStep(*input, 0))
+
+	fmt.Println(time.Now())
 
 	fmt.Printf("minimum number of steps = %d\n", minSteps)
 }
