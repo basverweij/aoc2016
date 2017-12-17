@@ -9,7 +9,7 @@
             "remotePath": "",
             "port": 2345,
             "host": "127.0.0.1",
-            "program": "${workspaceRoot}/day12",
+            "program": "${workspaceRoot}/day13",
             "env": {},
             "args": [],
             "showLog": true
