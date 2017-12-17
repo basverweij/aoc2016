@@ -40,3 +40,7 @@ Thus, reaching `7,4` would take a minimum of `11` steps (starting from your curr
 What is the **fewest number of steps** required for you to reach `31,39`?
 
 Your puzzle input is `1350`.
+
+## Part Two
+
+**How many locations** (distinct `x,y` coordinates, including your starting location) can you reach in at most `50` steps?

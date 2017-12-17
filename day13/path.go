@@ -9,7 +9,7 @@ type path struct {
 	len  int
 }
 
-func shortestPath(o office, from, to pos) int {
+func shortestPath(o office, from pos, done func(path, map[pos]struct{}) int) int {
 	todo := []path{path{head: from, len: 0}}
 
 	seen := make(map[pos]struct{}, 0)
@@ -26,9 +26,9 @@ func shortestPath(o office, from, to pos) int {
 
 		seen[p.head] = struct{}{}
 
-		if p.head == to {
-			// found destination
-			return p.len
+		d := done(p, seen)
+		if d > 0 {
+			return d
 		}
 
 		if p.head.y > 0 && !o[p.head.y-1][p.head.x] {
@@ -53,4 +53,24 @@ func shortestPath(o office, from, to pos) int {
 	}
 
 	return -1
+}
+
+func findShortesPathTo(to pos) func(path, map[pos]struct{}) int {
+	return func(p path, seen map[pos]struct{}) int {
+		if p.head == to {
+			return p.len
+		}
+
+		return 0
+	}
+}
+
+func findUniqueLocationsAtLen(l int) func(path, map[pos]struct{}) int {
+	return func(p path, seen map[pos]struct{}) int {
+		if p.len > l {
+			return len(seen) - 1
+		}
+
+		return 0
+	}
 }
