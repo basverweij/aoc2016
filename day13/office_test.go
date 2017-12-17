@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 const office10_7_10 = `  0123456789
 0 .#.####.##
@@ -15,5 +19,5 @@ const office10_7_10 = `  0123456789
 func TestOffice(t *testing.T) {
 	o := newOffice(10, 7, 10)
 
-	assertEquals(t, office10_7_10, o.String(), "office 10x7#10")
+	assert.Equal(t, office10_7_10, o.String())
 }
