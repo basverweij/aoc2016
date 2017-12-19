@@ -7,6 +7,6 @@ import (
 )
 
 func TestGenKeys(t *testing.T) {
-	keys := genKeys("abc", 64)
+	keys := genKeys("abc", 64, 0)
 	assert.Len(t, keys, 64)
 }

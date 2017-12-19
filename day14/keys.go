@@ -2,13 +2,13 @@ package main
 
 const keyWindow = 1000
 
-func genKeys(salt string, amount int) []*hash {
+func genKeys(salt string, amount int, stretching int) []*hash {
 	var keys []*hash
 	var hashes []*hash
 
 	// generate the first keyWindow hashes
 	for i := 0; i < keyWindow; i++ {
-		h := genHash(salt, i)
+		h := genHash(salt, i, stretching)
 		if h == nil {
 			continue
 		}
@@ -31,7 +31,7 @@ func genKeys(salt string, amount int) []*hash {
 		}
 
 		// gen hash for i
-		h := genHash(salt, i)
+		h := genHash(salt, i, stretching)
 		if h == nil {
 			continue
 		}

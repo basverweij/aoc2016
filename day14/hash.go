@@ -16,9 +16,14 @@ type hash struct {
 // genHash generates as hash from the salt and index.
 // it only returns a non-nil result if the generated hash
 // contains a triplet, and/or one or more quintents
-func genHash(salt string, index int) *hash {
+func genHash(salt string, index int, stretching int) *hash {
 	b := md5.Sum([]byte(salt + strconv.Itoa(index)))
 	s := hex.EncodeToString(b[:])
+
+	for i := 0; i < stretching; i++ {
+		b = md5.Sum([]byte(s))
+		s = hex.EncodeToString(b[:])
+	}
 
 	firstTriplet := getFirstTriplet(s)
 	quintets := getQuintets(s)

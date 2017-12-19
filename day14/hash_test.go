@@ -6,25 +6,36 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var testHash = `abc`
+var testSalt = `abc`
 
 func TestGenHash(t *testing.T) {
 	for i := 0; i < 18; i++ {
-		h := genHash(testHash, i)
+		h := genHash(testSalt, i, 0)
 		assert.Nil(t, h)
 	}
 
-	h := genHash(testHash, 18)
+	h := genHash(testSalt, 18, 0)
 	assert.NotNil(t, h)
 	assert.Equal(t, byte('8'), h.firstTriplet)
 
-	h = genHash(testHash, 792)
+	h = genHash(testSalt, 792, 0)
 	assert.NotNil(t, h)
 	assert.Equal(t, byte('3'), h.firstTriplet)
 	assert.Contains(t, h.quintets, byte('3'))
 
-	h = genHash(testHash, 816)
+	h = genHash(testSalt, 816, 0)
 	assert.NotNil(t, h)
+	assert.Contains(t, h.quintets, byte('e'))
+}
+
+func TestGenHashWithStretching(t *testing.T) {
+	h := genHash(testSalt, 5, 2016)
+	assert.Equal(t, byte('2'), h.firstTriplet)
+
+	h = genHash(testSalt, 10, 2016)
+	assert.Equal(t, byte('e'), h.firstTriplet)
+
+	h = genHash(testSalt, 89, 2016)
 	assert.Contains(t, h.quintets, byte('e'))
 }
 
