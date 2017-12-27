@@ -15,3 +15,5 @@ var input = []disc{
 	{5, 1},
 	{3, 0},
 }
+
+var input2 = append(input, disc{11, 0})
