@@ -2,21 +2,6 @@ package main
 
 import "fmt"
 
-type direction int
-
-const (
-	up direction = iota
-	down
-	left
-	right
-)
-
-var (
-	dirRunes = []rune{'U', 'D', 'L', 'R'}
-	xMoves   = []int{0, 0, -1, 1}
-	yMoves   = []int{-1, 1, 0, 0}
-)
-
 type path struct {
 	moves []direction
 	x, y  int
@@ -27,9 +12,9 @@ func (p *path) String() string {
 }
 
 func (p *path) movesString() string {
-	s := make([]rune, len(p.moves))
+	s := make([]byte, len(p.moves))
 	for i := range s {
-		s[i] = dirRunes[p.moves[i]]
+		s[i] = dirBytes[p.moves[i]]
 	}
 
 	return string(s)

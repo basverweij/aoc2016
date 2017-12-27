@@ -1,9 +1,5 @@
 package main
 
-import (
-	"crypto/md5"
-)
-
 func shortestPath(passcode string) string {
 	var shortest *path
 
@@ -35,22 +31,4 @@ func shortestPath(passcode string) string {
 	}
 
 	return shortest.movesString()
-}
-
-func getDirs(path *path, passcode string) []direction {
-	h := md5.Sum([]byte(passcode + path.movesString()))
-
-	var dirs []direction
-	for i := 0; i < 4; i++ {
-		if ((h[i/2] >> uint(4-(i%2)*4)) & 0xf) < 0xb {
-			// locked
-			continue
-		}
-
-		if layout[path.y][path.x][i] {
-			dirs = append(dirs, direction(i))
-		}
-	}
-
-	return dirs
 }
