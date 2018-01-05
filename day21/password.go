@@ -27,6 +27,10 @@ func (p *password) rotate(rotateLeft bool, steps int) {
 }
 
 func (p *password) reverse(x, y int) {
+	if x > y {
+		x, y = y, x
+	}
+
 	for i, j := x, y; i < j; i, j = i+1, j-1 {
 		p.value[i], p.value[j] = p.value[j], p.value[i]
 	}

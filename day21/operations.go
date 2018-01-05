@@ -4,6 +4,7 @@ import "fmt"
 
 type operation interface {
 	perform(pwd *password)
+	unperform(pwd *password)
 }
 
 type swapPosition struct {
@@ -19,6 +20,10 @@ func (sp *swapPosition) String() string {
 
 func (sp *swapPosition) perform(pwd *password) {
 	pwd.swap(sp.from, sp.to)
+}
+
+func (sp *swapPosition) unperform(pwd *password) {
+	pwd.swap(sp.to, sp.from)
 }
 
 type swapLetter struct {
@@ -44,6 +49,20 @@ func (sl *swapLetter) perform(pwd *password) {
 	}
 
 	pwd.swap(from, to)
+}
+
+func (sl *swapLetter) unperform(pwd *password) {
+	var from, to int
+
+	for i, l := range pwd.value {
+		if l == sl.fromLetter {
+			from = i
+		} else if l == sl.toLetter {
+			to = i
+		}
+	}
+
+	pwd.swap(to, from)
 }
 
 type rotate struct {
@@ -75,6 +94,10 @@ func (r *rotate) perform(pwd *password) {
 	pwd.rotate(r.rotateLeft, r.steps)
 }
 
+func (r *rotate) unperform(pwd *password) {
+	pwd.rotate(!r.rotateLeft, r.steps)
+}
+
 type rotateLetter struct {
 	letter byte
 }
@@ -102,6 +125,30 @@ func (rl *rotateLetter) perform(pwd *password) {
 	pwd.rotate(false, steps)
 }
 
+var unperformRotateLetter = map[int]int{
+	1: 1,
+	3: 2,
+	5: 3,
+	7: 4,
+	2: 6,
+	4: 7,
+	6: 0,
+	0: 1,
+}
+
+func (rl *rotateLetter) unperform(pwd *password) {
+	var steps int
+
+	for i, l := range pwd.value {
+		if l == rl.letter {
+			steps = i
+			break
+		}
+	}
+
+	pwd.rotate(true, unperformRotateLetter[steps])
+}
+
 type reverse struct {
 	from, to int
 }
@@ -117,6 +164,10 @@ func (r *reverse) perform(pwd *password) {
 	pwd.reverse(r.from, r.to)
 }
 
+func (r *reverse) unperform(pwd *password) {
+	pwd.reverse(r.to, r.from)
+}
+
 type move struct {
 	from, to int
 }
@@ -130,4 +181,8 @@ func (m *move) String() string {
 
 func (m *move) perform(pwd *password) {
 	pwd.move(m.from, m.to)
+}
+
+func (m *move) unperform(pwd *password) {
+	pwd.move(m.to, m.from)
 }

@@ -8,9 +8,10 @@ import (
 
 func TestScrambler(t *testing.T) {
 	ops := input(testInput)
+	assert.Equal(t, "abdec", scrambler("abcde", ops))
+}
 
-	// remove rotate right
-	ops = ops[0:8]
-
-	assert.Equal(t, "decab", scrambler("abcde", ops))
+func TestUnscrambler(t *testing.T) {
+	ops := input(testInput)
+	assert.Equal(t, "abcde", unscrambler("abdec", ops))
 }
